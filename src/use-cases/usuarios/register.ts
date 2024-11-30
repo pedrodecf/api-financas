@@ -2,6 +2,7 @@ import { Usuario } from "@prisma/client";
 import { UsuarioHttpRepository } from "../../repositories/usuarios/usuario-http-repository";
 import { hash } from "bcryptjs";
 import { EmailJaCadastradoError } from "../../errors/email-ja-cadastrado.error";
+import { Optional } from "../../lib/types";
 
 interface RegisterUseCaseRequest {
    nome: string
@@ -10,7 +11,7 @@ interface RegisterUseCaseRequest {
 }
 
 interface RegisterUseCaseResponse {
-   usuario: Usuario
+   usuario: Optional<Usuario, 'senha'>
 }
 
 export class RegisterUseCase {
@@ -35,8 +36,10 @@ export class RegisterUseCase {
          senha: passwordHash
       })
 
+      const { senha: _, ...usuarioWithoutPassword } = usuario
+
       return {
-         usuario
+         usuario: usuarioWithoutPassword
       }
    }
 }

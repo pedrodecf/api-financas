@@ -7,6 +7,6 @@ const app = express();
 app.use(express.json());
 app.use(router);
 app.use(errorHandler);
-app.listen(3000, () => {
-   console.log('Servidor rodando na porta 3000');
+app.listen(1234, () => {
+   console.log('Servidor rodando na porta 1234');
  });
