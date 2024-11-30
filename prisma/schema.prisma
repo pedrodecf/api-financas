@@ -20,6 +20,7 @@ model Usuario {
   senha      String
   balanco    Float       @default(0.0)
   transacoes Transacao[]
+  categorias Categoria[]
   created_at DateTime    @default(now())
   updated_at DateTime    @updatedAt
   deleted_at DateTime?
@@ -32,12 +33,12 @@ model Transacao {
   valor       Float
   tipo        TipoTransacao
   descricao   String?
-  categoria   Categoria?    @relation(fields: [categoriaId], references: [id])
+  categoria   Categoria     @relation(fields: [categoriaId], references: [id])
+  categoriaId Int
   data        DateTime      @default(now())
   usuario     Usuario       @relation(fields: [usuarioId], references: [id])
   usuarioId   String
   deleted_at  DateTime?
-  categoriaId Int
 
   @@map("transacoes")
 }
@@ -49,6 +50,8 @@ model Categoria {
   avatar     String
   deleted_at DateTime?
   transacoes Transacao[]
+  usuario    Usuario     @relation(fields: [usuarioId], references: [id])
+  usuarioId  String
 
   @@map("categorias")
 }
