@@ -9,6 +9,9 @@
     "dev": "ts-node-dev src/server.ts",
     "test": "vitest"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "devDependencies": {
     "@faker-js/faker": "^9.2.0",
     "@rocketseat/eslint-config": "^2.2.2",
