@@ -28,15 +28,29 @@ model Usuario {
 }
 
 model Transacao {
-  id        Int           @id @default(autoincrement())
-  valor     Float
-  tipo      TipoTransacao
-  descricao String?
-  data      DateTime      @default(now())
-  usuario   Usuario       @relation(fields: [usuarioId], references: [id])
-  usuarioId String
+  id          Int           @id @default(autoincrement())
+  valor       Float
+  tipo        TipoTransacao
+  descricao   String?
+  categoria   Categoria?    @relation(fields: [categoriaId], references: [id])
+  data        DateTime      @default(now())
+  usuario     Usuario       @relation(fields: [usuarioId], references: [id])
+  usuarioId   String
+  deleted_at  DateTime?
+  categoriaId Int
 
   @@map("transacoes")
+}
+
+model Categoria {
+  id         Int         @id @default(autoincrement())
+  nome       String
+  descricao  String
+  avatar     String
+  deleted_at DateTime?
+  transacoes Transacao[]
+
+  @@map("categorias")
 }
 
 enum TipoTransacao {
