@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { UsuarioInMemoryRepository } from "../../repositories/usuarios/usuario-in-memory-repository";
 import { RegisterUseCase } from "./register";
-import { EmailJaCadastradoError } from "../../errors/email-ja-cadastrado.error";
 import { compare } from "bcryptjs";
+import { ConteudoExistenteError } from "../../errors/conteudo-existente.error";
 
 let usuarioRepository: UsuarioInMemoryRepository
 let sut: RegisterUseCase
@@ -38,26 +38,26 @@ describe('Register Use Case', () => {
          nome: 'John Doe',
          email,
          senha: '123456'
-      })).rejects.toBeInstanceOf(EmailJaCadastradoError)
+      })).rejects.toBeInstanceOf(ConteudoExistenteError)
    })
 
    it('should hash the password before saving', async () => {
       const { usuario } = await sut.execute({
-        nome: 'John Doe',
-        email: 'john@doe.com',
-        senha: '123456'
+         nome: 'John Doe',
+         email: 'john@doe.com',
+         senha: '123456'
       })
-    
+
       const userWithPassword = await usuarioRepository.findByEmail(usuario.email)
-    
+
       expect(userWithPassword!.senha).not.toBe('123456')
-    
+
       const isPasswordCorrectlyHashed = await compare(
-        '123456',
-        userWithPassword!.senha
+         '123456',
+         userWithPassword!.senha
       )
-    
+
       expect(isPasswordCorrectlyHashed).toBe(true)
-    })
+   })
 
 })

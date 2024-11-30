@@ -19,6 +19,17 @@ export class CategoriasHttpRepository implements CategoriasRepository {
       return categorias
    }
 
+   async findByName(nome: string, usuarioId: string): Promise<Categoria | null> { 
+      const categoria = prisma.categoria.findFirst({
+         where: {
+            nome,
+            usuarioId,
+            deleted_at: null
+         }
+      })
+      return categoria
+   }
+
    async findById(id: number): Promise<Categoria | null> {
       const categoria = prisma.categoria.findUnique({ where: { id } })
       return categoria

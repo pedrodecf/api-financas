@@ -1,8 +1,8 @@
 import { Usuario } from "@prisma/client";
 import { UsuarioHttpRepository } from "../../repositories/usuarios/usuario-http-repository";
 import { hash } from "bcryptjs";
-import { EmailJaCadastradoError } from "../../errors/email-ja-cadastrado.error";
 import { Optional } from "../../lib/types";
+import { ConteudoExistenteError } from "../../errors/conteudo-existente.error";
 
 interface RegisterUseCaseRequest {
    nome: string
@@ -25,7 +25,7 @@ export class RegisterUseCase {
       const userWithSameEmail = await this.usuarioRepository.findByEmail(email)
 
       if (userWithSameEmail) {
-         throw new EmailJaCadastradoError()
+         throw new ConteudoExistenteError('Já existe um usuário com esse email')
       }
 
       const passwordHash = await hash(senha, 6)
