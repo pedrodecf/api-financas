@@ -9,3 +9,14 @@ Content-Type: application/json
     "email": "laishelen2a@email.com",
     "senha": "123456789"
 }
+
+###
+
+# @name authenticate_user
+POST {{baseUrl}}/usuarios/login
+Content-Type: application/json
+
+{
+    "email": "laishelen2a@email.com",
+    "senha": "123456789"
+}
