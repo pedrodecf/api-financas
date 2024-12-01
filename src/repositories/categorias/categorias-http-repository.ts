@@ -19,7 +19,7 @@ export class CategoriasHttpRepository implements CategoriasRepository {
       return categorias
    }
 
-   async findByName(nome: string, usuarioId: string): Promise<Categoria | null> { 
+   async findByName(nome: string, usuarioId: string): Promise<Categoria | null> {
       const categoria = prisma.categoria.findFirst({
          where: {
             nome,
@@ -30,9 +30,9 @@ export class CategoriasHttpRepository implements CategoriasRepository {
       return categoria
    }
 
-   async findById(id: number, tx?: Prisma.TransactionClient): Promise<Categoria | null> {
+   async findById(id: number, usuarioId: string, tx?: Prisma.TransactionClient): Promise<Categoria | null> {
       const prismaInstance = tx || prisma
-      return prismaInstance.categoria.findUnique({ where: { id } })
+      return prismaInstance.categoria.findUnique({ where: { id, usuarioId } })
    }
 
    async delete(id: number): Promise<Categoria> {

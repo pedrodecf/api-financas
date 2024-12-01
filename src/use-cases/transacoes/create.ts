@@ -38,7 +38,7 @@ export class CreateUseCase {
       return prisma.$transaction(async (tx) => {
          const usuario = await this.validateUser(usuarioId, tx)
 
-         await this.validateCategoria(categoriaId, tx)
+         await this.validateCategoria(categoriaId, usuarioId, tx)
 
          const transacao = await this.createTransaction({
             valor,
@@ -77,9 +77,10 @@ export class CreateUseCase {
 
    private async validateCategoria(
       categoriaId: number,
+      usuarioId: string,
       tx: Prisma.TransactionClient
    ): Promise<void> {
-      const categoria = await this.categoriasRepository.findById(categoriaId, tx)
+      const categoria = await this.categoriasRepository.findById(categoriaId, usuarioId, tx)
 
       if (!categoria) {
          throw new RecursoNaoEncontradoError('Categoria não encontrada')
