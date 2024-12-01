@@ -2,7 +2,10 @@ import { UsuarioHttpRepository } from "../../repositories/usuarios/usuario-http-
 import { GetByIdUseCase } from "../../use-cases/usuarios/get-by-id";
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-export async function profile(request: FastifyRequest, reply: FastifyReply) {
+export async function profile(
+   request: FastifyRequest,
+   reply: FastifyReply
+) {
    const usuarioRepository = new UsuarioHttpRepository()
    const getbyemailUseCase = new GetByIdUseCase(usuarioRepository)
 

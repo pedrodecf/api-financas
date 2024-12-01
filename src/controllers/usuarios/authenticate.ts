@@ -21,16 +21,12 @@ export async function authenticate(
       const { usuario } = await authenticateUseCase.execute({ email, senha })
 
       const token = await reply.jwtSign({
-         sign: {
-            sub: usuario.id,
-         }
+         sub: usuario.id,
       })
 
       const refreshToken = await reply.jwtSign({
-         sign: {
-            sub: usuario.id,
-            expiresIn: '7d'
-         }
+         sub: usuario.id,
+         expiresIn: '7d'
       })
 
       return reply
