@@ -32,4 +32,9 @@ export class UsuarioInMemoryRepository implements UsuarioRepository {
       if (!usuario) return null
       return usuario
    }
+
+   async updateBalanco(usuario: Usuario, novoBalanco: number, tx?: Prisma.TransactionClient): Promise<Usuario> {
+      usuario.balanco = novoBalanco
+      return usuario
+   }
 }
