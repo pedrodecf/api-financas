@@ -1,7 +1,8 @@
 import { compare } from "bcryptjs";
 import { CredenciaisInvalidasError } from "../../errors/credenciais-invalidas.error";
 import { UsuarioHttpRepository } from "../../repositories/usuarios/usuario-http-repository";
-import jwt from 'jsonwebtoken';
+import { Optional } from "../../lib/types";
+import { Usuario } from "@prisma/client";
 
 interface AuthenticateUseCaseRequest {
    email: string
@@ -9,38 +10,32 @@ interface AuthenticateUseCaseRequest {
 }
 
 interface AuthenticateUseCaseResponse {
-   token: string
+   usuario: Optional<Usuario, 'senha'>
 }
 
 export class AuthenticateUseCase {
-   constructor (private readonly usuarioRepository: UsuarioHttpRepository) { }
+   constructor(private readonly usuarioRepository: UsuarioHttpRepository) { }
 
    async execute({
       email,
       senha
    }: AuthenticateUseCaseRequest): Promise<AuthenticateUseCaseResponse> {
-      const usuario = await this.usuarioRepository.findByEmail(email)
+      const user = await this.usuarioRepository.findByEmail(email)
 
-      if (!usuario) {
+      if (!user) {
          throw new CredenciaisInvalidasError()
       }
 
-      const doesPasswordMatch = await compare(senha, usuario.senha)
+      const doesPasswordMatch = await compare(senha, user.senha)
 
       if (!doesPasswordMatch) {
          throw new CredenciaisInvalidasError()
       }
 
-      const token = jwt.sign(
-         { sub: usuario.id },
-         process.env.JWT_SECRET as string,
-         {
-            expiresIn: process.env.JWT_EXPIRES_IN,
-         }
-      );
+      const { senha: _, ...usuarioWithoutPassword } = user
 
       return {
-         token,
+         usuario: usuarioWithoutPassword
       }
    }
 

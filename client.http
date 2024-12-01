@@ -1,4 +1,5 @@
 @baseUrl = http://localhost:1234
+@authToken = {{authenticate.response.body.token}}
 
 # @name create_user
 POST {{baseUrl}}/usuarios
@@ -6,17 +7,35 @@ Content-Type: application/json
 
 {
     "nome": "Lais Helena",
-    "email": "laishelen2a@email.com",
+    "email": "laishelena@email.com",
     "senha": "123456789"
 }
 
 ###
 
-# @name authenticate_user
+# @name authenticate
 POST {{baseUrl}}/usuarios/login
 Content-Type: application/json
 
 {
-    "email": "laishelen2a@email.com",
+    "email": "laishelena@email.com",
     "senha": "123456789"
+}
+
+###
+
+# @name get_user_by_email
+GET {{baseUrl}}/usuarios/me
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+###
+
+# @name create_category
+POST {{baseUrl}}/categorias
+Content-Type: application/json
+
+{
+    "nome": "Lazer"
+    
 }

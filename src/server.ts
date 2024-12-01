@@ -1,13 +1,11 @@
-import express from 'express';
-import { router } from './routes';
-import { errorHandler } from './middlewares/error-handler';
-import 'dotenv/config';
+import { app } from "./app";
+import { env } from "./env";
 
-const app = express();
-
-app.use(express.json());
-app.use(router);
-app.use(errorHandler);
-app.listen(1234, () => {
-   console.log('Servidor rodando na porta 1234');
- });
+app
+   .listen({
+      host: '0.0.0.0',
+      port: env.PORT,
+   })
+   .then(() => {
+      console.log(`🚀 Server listening on port ${env.PORT}`);
+   })

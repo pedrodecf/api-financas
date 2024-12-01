@@ -1,47 +1,44 @@
-import { Request, Response, NextFunction } from 'express';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import { ZodError } from 'zod';
 import { AppError } from '../errors/app-error';
 
-export const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (err instanceof ZodError) {
-    const formattedErrors = err.errors.map((error) => {
-      if (error.code === 'unrecognized_keys') {
-        const unknownKeys = error.keys;
+export function errorHandler(
+  error: Error,
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  if (error instanceof ZodError) {
+    const formattedErrors = error.errors.map((err) => {
+      if (err.code === 'unrecognized_keys') {
+        const unknownKeys = err.keys;
         return unknownKeys.map((key) => `Campo ${key} não existe`).join(', ');
       }
 
-      const field = error.path.join('.');
+      const field = err.path.join('.');
 
-      if (error.code === 'invalid_type' && error.received === 'undefined') {
+      if (err.code === 'invalid_type' && err.received === 'undefined') {
         return `Campo ${field} é obrigatório`;
       }
 
-      return `Campo ${field}: ${error.message}`;
+      return `Campo ${field}: ${err.message}`;
     });
 
-    res.status(400).json({
+    reply.status(400).send({
       status: 400,
       message: 'Erro de validação',
       errors: formattedErrors,
     });
-  }
+  } else if (error instanceof AppError) {
+    reply.status(error.statusCode).send({
+      status: error.statusCode,
+      message: error.message,
+    });
+  } else {
+    console.error(error);
 
-  if (err instanceof AppError) {
-    res.status(err.statusCode).json({
-      status: err.statusCode,
-      message: err.message,
+    reply.status(500).send({
+      status: 500,
+      message: error.message,
     });
   }
-
-  console.error(err);
-
-  res.status(500).json({
-    status: 500,
-    message: err.message,
-  });
 }
