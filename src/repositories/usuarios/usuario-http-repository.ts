@@ -14,9 +14,20 @@ export class UsuarioHttpRepository implements UsuarioRepository {
       return usuario
    }
 
-   async findById(id: string): Promise<Usuario | null> {
-      const usuario = await prisma.usuario.findUnique({ where: { id } })
-      if (!usuario) return null
-      return usuario
+   async findById(id: string, tx?: Prisma.TransactionClient): Promise<Usuario | null> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.usuario.findUnique({ where: { id } })
+   }
+
+   async updateBalanco(
+      usuario: Usuario,
+      novoBalanco: number,
+      tx?: Prisma.TransactionClient
+   ): Promise<Usuario> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.usuario.update({
+         where: { id: usuario.id },
+         data: { balanco: novoBalanco }
+      })
    }
 }

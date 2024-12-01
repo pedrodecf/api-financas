@@ -3,9 +3,9 @@ import { TransacoesRepository } from "./transacoes-repository";
 import { prisma } from "../../lib/prisma";
 
 export class TransacoesHttpRepository implements TransacoesRepository {
-   async create(data: Prisma.TransacaoUncheckedCreateInput): Promise<Transacao> {
-      const transacao = await prisma.transacao.create({ data })
-      return transacao
+   async create(data: Prisma.TransacaoUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transacao> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.transacao.create({ data })
    }
 
    async findByUsuarioId(usuarioId: string): Promise<Transacao[]> {
