@@ -11,7 +11,11 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       valor: z.number().positive(),
       tipo: z.enum(['Entrada', 'Saida']),
       descricao: z.string().optional(),
-      data: z.date().optional(),
+      data: z
+         .preprocess(
+            (val) => (typeof val === "string" ? new Date(val) : val),
+            z.date().optional()
+         ),
    });
 
    try {

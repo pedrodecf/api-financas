@@ -1,11 +1,9 @@
 import { Prisma, TipoTransacao, Transacao } from "@prisma/client";
-import { TransacoesRepository } from "../../repositories/transacoes/transacoes-repository";
-import { prisma } from "../../lib/prisma";
-import { getPeriodByYearOrMonth } from "../../lib/get-period-by-year-or-month";
+import { getPeriodByDates } from "../../lib/get-period-by-dates";
 import { TransacoesHttpRepository } from "../../repositories/transacoes/transacoes-http-repository";
 
 type Order = {
-   orderBy: 'id' | 'nome' | 'data' | 'valor';
+   orderBy: 'id' | 'data' | 'valor';
    ordination: 'asc' | 'desc';
 };
 
@@ -16,12 +14,12 @@ type Pagination = {
 
 type Filters = {
    tipo?: TipoTransacao;
-   valor?: number;
-   valor_filter?: 'equals' | 'gt' | 'lt';
+   valorMin?: number;
+   valorMax?: number;
    categoriaId?: number;
    usuarioId: string;
-   mes?: number;
-   ano?: number;
+   periodoDe?: string;
+   periodoAte?: string;
 };
 
 interface ListUseCaseRequest {
@@ -39,65 +37,69 @@ interface ListUseCaseResponse {
 export class ListUseCase {
    constructor(private readonly transacoesRepository: TransacoesHttpRepository) { }
 
-   async execute({
-      order,
-      pagination,
-      filters,
-   }: ListUseCaseRequest): Promise<ListUseCaseResponse> {
-      return await prisma.$transaction(async (tx) => {
-         const { startDate, endDate } = getPeriodByYearOrMonth({
-            month: filters.mes,
-            year: filters.ano,
-         });
+   async execute({ order, pagination, filters }: ListUseCaseRequest): Promise<ListUseCaseResponse> {
+      const { orderBy, ordination } = order;
+      const { page, quantity } = pagination;
+      const { usuarioId, categoriaId, periodoDe, periodoAte, tipo, valorMin, valorMax } = filters;
 
-         const hasFilterDate = !!(startDate && endDate);
+      const { startDate, endDate } = getPeriodByDates({
+         periodoDe,
+         periodoAte,
+      });
 
-         const where: Prisma.TransacaoWhereInput = {
-            ...filters,
-            usuarioId: filters.usuarioId,
-            categoriaId: filters.categoriaId,
-            tipo: filters.tipo,
-            valor: filters.valor
-               ? { [filters.valor_filter || 'equals']: filters.valor }
-               : undefined,
-            data: hasFilterDate
-               ? {
-                  gte: startDate,
-                  lte: endDate,
-               }
-               : undefined,
-            deleted_at: null,
-         };
+      console.log('startDate', startDate);
+      console.log('endDate', endDate);
 
-         const orderBy: Prisma.TransacaoOrderByWithRelationInput = {
-            [order.orderBy]: order.ordination,
-         };
+      const hasRangeValues = !!(valorMin && valorMax);
 
-         const skip = (pagination.page - 1) * pagination.quantity;
-         const take = pagination.quantity;
-
-         const items = await this.transacoesRepository.list(
-            {
-               where,
-               orderBy,
-               skip,
-               take,
-               include: {
-                  categoria: true,
-               },
+      const where: Prisma.TransacaoWhereInput = {
+         data: {
+            gte: startDate,
+            lte: endDate,
+         },
+         usuarioId,
+         categoriaId,
+         tipo,
+         ...(hasRangeValues ? {
+            valor: {
+               gte: valorMin,
+               lte: valorMax,
             },
-            tx
-         );
+         } :
+            {
+               valor: {
+                  equals: valorMin
+               }
+            }),
+         deleted_at: null,
+      };
 
-         const totalItems = await this.transacoesRepository.count({ where }, tx);
+      const [totalItems, items] = await this.transacoesRepository.$transaction(async (tx) => {
+         return Promise.all([
+            this.transacoesRepository.count({ where }, tx),
+            this.transacoesRepository.list(
+               {
+                  where,
+                  orderBy: {
+                     [orderBy]: ordination,
+                  },
+                  skip: (page - 1) * quantity,
+                  take: quantity,
+                  include: {
+                     categoria: true,
+                  },
+               },
+               tx
+            ),
+         ]);
+      });
 
-         const pages = Math.ceil(totalItems / pagination.quantity);
+      const pages = Math.ceil(totalItems / quantity);
 
-         return {
-            pages,
-            items,
-            totalItems,
-         };
-      })
+      return {
+         items,
+         totalItems,
+         pages,
+      };
    }
 }

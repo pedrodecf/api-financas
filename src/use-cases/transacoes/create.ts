@@ -44,7 +44,7 @@ export class CreateUseCase {
             valor,
             categoriaId,
             descricao,
-            data: data || new Date(),
+            data: data ? new Date(data) : new Date(),
             tipo,
             usuarioId
          }, tx)

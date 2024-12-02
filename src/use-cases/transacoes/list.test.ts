@@ -35,6 +35,7 @@ describe('List Use Case', () => {
          },
       });
 
+      console.log(result)
 
       expect(result.items.length).toBe(2);
       expect(result.totalItems).toBe(2);

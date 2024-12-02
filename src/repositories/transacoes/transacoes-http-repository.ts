@@ -1,7 +1,6 @@
 import { Prisma, TipoTransacao, Transacao } from "@prisma/client";
 import { TransacoesRepository } from "./transacoes-repository";
 import { prisma } from "../../lib/prisma";
-import { getPeriodByYearOrMonth } from "../../lib/get-period-by-year-or-month";
 
 type Order = {
    orderBy: 'id' | 'nome' | 'createdAt';
@@ -24,13 +23,11 @@ type Filters = {
 };
 
 
-type ListProps = {
-   order: Order;
-   pagination: Pagination;
-   filters: Filters
-}
-
 export class TransacoesHttpRepository implements TransacoesRepository {
+   async $transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+      return prisma.$transaction(fn);
+   }
+
    async create(data: Prisma.TransacaoUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transacao> {
       const prismaInstance = tx || prisma
       return prismaInstance.transacao.create({ data })
