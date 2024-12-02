@@ -32,7 +32,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
          valor,
          tipo,
          descricao,
-         data: data ? data : new Date(),
+         data: data,
          usuarioId: request.user.sub,
       });
 

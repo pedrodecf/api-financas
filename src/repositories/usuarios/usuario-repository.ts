@@ -1,4 +1,4 @@
-import { Prisma, TipoTransacao, Usuario } from "@prisma/client"
+import { Prisma, Usuario } from "@prisma/client"
 
 export interface UsuarioRepository {
    create(data: Prisma.UsuarioUncheckedCreateInput): Promise<Usuario>
