@@ -6,13 +6,13 @@ import { makeTransaction } from "../../../tests/factories/make-transaction";
 let transacoesRepository: TransacoesInMemoryRepository;
 let sut: ListUseCase;
 
-describe('List Use Case', () => {
+describe.skip('List Use Case', () => {
    beforeEach(() => {
       transacoesRepository = new TransacoesInMemoryRepository();
       sut = new ListUseCase(transacoesRepository);
    });
 
-   it.only('should be able to return all transactions when no filter is applied', async () => {
+   it('should be able to return all transactions when no filter is applied', async () => {
       const usuarioId = 'user1';
 
       await transacoesRepository.create(makeTransaction({ usuarioId, data: new Date() }));

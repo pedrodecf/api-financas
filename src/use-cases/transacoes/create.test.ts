@@ -50,6 +50,6 @@ describe('Create Use Case', () => {
       expect(transacao.tipo).toEqual('Entrada')
       expect(transacao.valor).toEqual(100)
       expect(transacao.descricao).toEqual('Salário')
-      expect(usuario.balanco).toEqual(100)
+      expect(usuario.balanco).toEqual(100.0)
    })
 })

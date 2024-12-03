@@ -1,10 +1,10 @@
 import { TipoTransacao, Transacao, Usuario, Prisma } from "@prisma/client";
-import { TransacoesHttpRepository } from "../../repositories/transacoes/transacoes-http-repository";
-import { UsuarioHttpRepository } from "../../repositories/usuarios/usuario-http-repository";
-import { CategoriasHttpRepository } from "../../repositories/categorias/categorias-http-repository";
 import { RecursoNaoEncontradoError } from "../../errors/recurso-nao-encontrado.error";
 import { SaldoInsuficienteError } from "../../errors/saldo-insuficiente.error";
 import { prisma } from "../../lib/prisma";
+import { TransacoesRepository } from "../../repositories/transacoes/transacoes-repository";
+import { UsuarioRepository } from "../../repositories/usuarios/usuario-repository";
+import { CategoriasRepository } from "../../repositories/categorias/categorias-repository";
 
 interface CreateUseCaseRequest {
    valor: number
@@ -22,9 +22,9 @@ interface CreateUseCaseResponse {
 
 export class CreateUseCase {
    constructor(
-      private readonly transacoesRepository: TransacoesHttpRepository,
-      private readonly usuariosRepository: UsuarioHttpRepository,
-      private readonly categoriasRepository: CategoriasHttpRepository
+      private readonly transacoesRepository: TransacoesRepository,
+      private readonly usuariosRepository: UsuarioRepository,
+      private readonly categoriasRepository: CategoriasRepository
    ) { }
 
    async execute({
@@ -35,7 +35,7 @@ export class CreateUseCase {
       tipo,
       usuarioId
    }: CreateUseCaseRequest): Promise<CreateUseCaseResponse> {
-      return prisma.$transaction(async (tx) => {
+      return this.transacoesRepository.$transaction(async (tx) => {
          const usuario = await this.validateUser(usuarioId, tx)
 
          await this.validateCategoria(categoriaId, usuarioId, tx)

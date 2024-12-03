@@ -71,8 +71,6 @@ export class ListUseCase {
          deleted_at: null,
       };
 
-      console.log('Filtros aplicados:', JSON.stringify(where, null, 2));
-      
       const [totalItems, items] = await this.transacoesRepository.$transaction(async (tx) => {
          return Promise.all([
             this.transacoesRepository.count({ where }, tx),
