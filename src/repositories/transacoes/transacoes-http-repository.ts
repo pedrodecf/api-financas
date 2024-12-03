@@ -2,27 +2,6 @@ import { Prisma, TipoTransacao, Transacao } from "@prisma/client";
 import { TransacoesRepository } from "./transacoes-repository";
 import { prisma } from "../../lib/prisma";
 
-type Order = {
-   orderBy: 'id' | 'nome' | 'createdAt';
-   ordination: 'asc' | 'desc';
-};
-
-type Pagination = {
-   page: number;
-   quantity: number;
-};
-
-type Filters = {
-   tipo: TipoTransacao;
-   valor: number;
-   valor_filter: 'equals' | 'gt' | 'lt';
-   categoriaId: number;
-   usuarioId: string;
-   mes: number;
-   ano: number;
-};
-
-
 export class TransacoesHttpRepository implements TransacoesRepository {
    async $transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
       return prisma.$transaction(fn);

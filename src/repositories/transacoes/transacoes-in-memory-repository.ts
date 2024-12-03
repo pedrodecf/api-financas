@@ -4,6 +4,11 @@ import { TransacoesRepository } from "./transacoes-repository";
 export class TransacoesInMemoryRepository implements TransacoesRepository {
    public transacoes: Transacao[] = []
 
+   async $transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+      const dummyTx = {} as Prisma.TransactionClient;
+      return fn(dummyTx);
+   }
+
    async create(data: Prisma.TransacaoUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transacao> {
       const transacao: Transacao = {
          id: data.id || this.transacoes.length + 1,
@@ -55,7 +60,6 @@ export class TransacoesInMemoryRepository implements TransacoesRepository {
             this.applyWhereFilter(transacao, params.where!)
          );
       }
-
 
       if (params.orderBy) {
          result.sort((a, b) => this.applyOrderBy(a, b, params.orderBy!));

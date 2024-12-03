@@ -1,6 +1,7 @@
 import { Prisma, Transacao } from "@prisma/client"
 
 export interface TransacoesRepository {
+   $transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T>
    create(data: Prisma.TransacaoUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transacao>
    findByUsuarioId(usuarioId: string): Promise<Transacao[]>
    findById(id: number): Promise<Transacao | null>

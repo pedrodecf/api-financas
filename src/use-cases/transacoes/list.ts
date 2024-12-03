@@ -1,6 +1,6 @@
 import { Prisma, TipoTransacao, Transacao } from "@prisma/client";
 import { getPeriodByDates } from "../../lib/get-period-by-dates";
-import { TransacoesHttpRepository } from "../../repositories/transacoes/transacoes-http-repository";
+import { TransacoesRepository } from "../../repositories/transacoes/transacoes-repository";
 
 type Order = {
    orderBy: 'id' | 'data' | 'valor';
@@ -35,7 +35,7 @@ interface ListUseCaseResponse {
 }
 
 export class ListUseCase {
-   constructor(private readonly transacoesRepository: TransacoesHttpRepository) { }
+   constructor(private readonly transacoesRepository: TransacoesRepository) { }
 
    async execute({ order, pagination, filters }: ListUseCaseRequest): Promise<ListUseCaseResponse> {
       const { orderBy, ordination } = order;
@@ -46,9 +46,6 @@ export class ListUseCase {
          periodoDe,
          periodoAte,
       });
-
-      console.log('startDate', startDate);
-      console.log('endDate', endDate);
 
       const hasRangeValues = !!(valorMin && valorMax);
 
@@ -74,6 +71,8 @@ export class ListUseCase {
          deleted_at: null,
       };
 
+      console.log('Filtros aplicados:', JSON.stringify(where, null, 2));
+      
       const [totalItems, items] = await this.transacoesRepository.$transaction(async (tx) => {
          return Promise.all([
             this.transacoesRepository.count({ where }, tx),

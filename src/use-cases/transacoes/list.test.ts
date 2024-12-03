@@ -15,15 +15,12 @@ describe('List Use Case', () => {
    it.only('should be able to return all transactions when no filter is applied', async () => {
       const usuarioId = 'user1';
 
-      await transacoesRepository.create(makeTransaction({ usuarioId }));
-      await transacoesRepository.create(makeTransaction({ usuarioId }));
-
-      const test = await transacoesRepository.findByUsuarioId('user1');
-      console.log(test);
+      await transacoesRepository.create(makeTransaction({ usuarioId, data: new Date() }));
+      await transacoesRepository.create(makeTransaction({ usuarioId, data: new Date() }));
 
       const result = await sut.execute({
          order: {
-            orderBy: 'valor',
+            orderBy: 'id',
             ordination: 'asc',
          },
          pagination: {
@@ -34,8 +31,6 @@ describe('List Use Case', () => {
             usuarioId,
          },
       });
-
-      console.log(result)
 
       expect(result.items.length).toBe(2);
       expect(result.totalItems).toBe(2);
