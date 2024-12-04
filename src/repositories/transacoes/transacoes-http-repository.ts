@@ -1,4 +1,4 @@
-import { Prisma, TipoTransacao, Transacao } from "@prisma/client";
+import { Prisma, Transacao } from "@prisma/client";
 import { TransacoesRepository } from "./transacoes-repository";
 import { prisma } from "../../lib/prisma";
 
@@ -23,9 +23,9 @@ export class TransacoesHttpRepository implements TransacoesRepository {
       return transacoes
    }
 
-   async findById(id: number): Promise<Transacao | null> {
-      const transacao = prisma.transacao.findUnique({ where: { id } })
-      return transacao
+   async findById(id: number, tx?: Prisma.TransactionClient): Promise<Transacao | null> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.transacao.findUnique({ where: { id } })
    }
 
    async delete(id: number): Promise<Transacao> {
@@ -57,5 +57,17 @@ export class TransacoesHttpRepository implements TransacoesRepository {
    ): Promise<number> {
       const prismaClient = tx || prisma;
       return prismaClient.transacao.count(params);
+   }
+
+   async update(
+      id: number,
+      data: Prisma.TransacaoUncheckedUpdateInput,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao> {
+      const prismaClient = tx || prisma;
+      return prismaClient.transacao.update({
+         where: { id },
+         data
+      });
    }
 }

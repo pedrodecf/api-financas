@@ -4,7 +4,7 @@ export interface TransacoesRepository {
    $transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T>
    create(data: Prisma.TransacaoUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transacao>
    findByUsuarioId(usuarioId: string): Promise<Transacao[]>
-   findById(id: number): Promise<Transacao | null>
+   findById(id: number, tx?: Prisma.TransactionClient): Promise<Transacao | null>
    delete(id: number): Promise<Transacao>
    list(
       params: {
@@ -21,4 +21,9 @@ export interface TransacoesRepository {
       params: { where?: Prisma.TransacaoWhereInput },
       tx?: Prisma.TransactionClient
    ): Promise<number>;
+   update(
+      id: number,
+      data: Prisma.TransacaoUncheckedUpdateInput,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao>;
 }
