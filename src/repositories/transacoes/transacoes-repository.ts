@@ -13,6 +13,7 @@ export interface TransacoesRepository {
          skip?: number;
          take?: number;
          include?: Prisma.TransacaoInclude;
+         select?: Prisma.TransacaoSelect;
       },
       tx?: Prisma.TransactionClient
    ): Promise<Transacao[]>;

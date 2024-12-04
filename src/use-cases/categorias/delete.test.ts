@@ -1,8 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { UsuarioInMemoryRepository } from "../../repositories/usuarios/usuario-in-memory-repository";
-import { TransacoesInMemoryRepository } from "../../repositories/transacoes/transacoes-in-memory-repository";
 import { DeleteUseCase } from "./delete";
-import { makeTransaction } from "../../../tests/factories/make-transaction";
 import { RecursoNaoEncontradoError } from "../../errors/recurso-nao-encontrado.error";
 import { makeUser } from "../../../tests/factories/make-user";
 import { hash } from "bcryptjs";

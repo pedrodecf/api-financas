@@ -7,6 +7,7 @@ import { filterObjects } from "../../lib/filter-objects";
 export async function list(request: FastifyRequest, reply: FastifyReply) {
    const listQuerySchema = z.object({
       tipo: z.enum(['Entrada', 'Saida']).optional(),
+      valor: z.coerce.number().positive().optional(),
       valorMin: z.coerce.number().positive().optional(),
       valorMax: z.coerce.number().positive().optional(),
       categoriaId: z.coerce.number().optional(),
@@ -18,7 +19,7 @@ export async function list(request: FastifyRequest, reply: FastifyReply) {
       ordination: z.enum(['asc', 'desc']),
    })
    try {
-      const { tipo, valorMin, valorMax, categoriaId, periodoDe, periodoAte, page, quantity, orderBy, ordination } = listQuerySchema.parse(request.query)
+      const { tipo, valor, valorMin, valorMax, categoriaId, periodoDe, periodoAte, page, quantity, orderBy, ordination } = listQuerySchema.parse(request.query)
 
       const transacoesRepository = new TransacoesHttpRepository()
       const listUseCase = new ListUseCase(transacoesRepository)
@@ -27,6 +28,7 @@ export async function list(request: FastifyRequest, reply: FastifyReply) {
          filters: {
             ...filterObjects({
                tipo,
+               valor,
                valorMin,
                valorMax,
                categoriaId,

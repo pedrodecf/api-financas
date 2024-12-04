@@ -2,18 +2,24 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { TransacoesInMemoryRepository } from "../../repositories/transacoes/transacoes-in-memory-repository";
 import { ListUseCase } from "./list";
 import { makeTransaction } from "../../../tests/factories/make-transaction";
+import { UsuarioInMemoryRepository } from "../../repositories/usuarios/usuario-in-memory-repository";
+import { makeUser } from "../../../tests/factories/make-user";
 
 let transacoesRepository: TransacoesInMemoryRepository;
+let usuarioRepository: UsuarioInMemoryRepository
 let sut: ListUseCase;
 
-describe.skip('List Use Case', () => {
+describe('List Use Case', () => {
    beforeEach(() => {
       transacoesRepository = new TransacoesInMemoryRepository();
+      usuarioRepository = new UsuarioInMemoryRepository()
       sut = new ListUseCase(transacoesRepository);
    });
 
-   it('should be able to return all transactions when no filter is applied', async () => {
+   it.only('should be able to return all transactions when no filter is applied', async () => {
       const usuarioId = 'user1';
+
+      await usuarioRepository.create(makeUser({ id: usuarioId }));
 
       await transacoesRepository.create(makeTransaction({ usuarioId, data: new Date() }));
       await transacoesRepository.create(makeTransaction({ usuarioId, data: new Date() }));
@@ -28,7 +34,7 @@ describe.skip('List Use Case', () => {
             quantity: 10,
          },
          filters: {
-            usuarioId,
+            usuarioId: 'user1',
          },
       });
 

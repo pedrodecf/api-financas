@@ -14,6 +14,7 @@ type Pagination = {
 
 type Filters = {
    tipo?: TipoTransacao;
+   valor?: number;
    valorMin?: number;
    valorMax?: number;
    categoriaId?: number;
@@ -38,65 +39,90 @@ export class ListUseCase {
    constructor(private readonly transacoesRepository: TransacoesRepository) { }
 
    async execute({ order, pagination, filters }: ListUseCaseRequest): Promise<ListUseCaseResponse> {
-      const { orderBy, ordination } = order;
-      const { page, quantity } = pagination;
-      const { usuarioId, categoriaId, periodoDe, periodoAte, tipo, valorMin, valorMax } = filters;
+      return await this.transacoesRepository.$transaction(async (tx) => {
+         const { usuarioId, categoriaId, periodoDe, periodoAte, tipo, valor, valorMin, valorMax } = filters;
 
-      const { startDate, endDate } = getPeriodByDates({
-         periodoDe,
-         periodoAte,
-      });
+         const { startDate, endDate } = getPeriodByDates({
+            periodoDe,
+            periodoAte,
+         });
 
-      const hasRangeValues = !!(valorMin && valorMax);
+         const hasRangeValues = !!(valorMin && valorMax && !valor);
+         const aboveSuchValue = !!(valorMin && !valorMax && !valor);
+         const belowSuchValue = !!(valorMax && !valorMin && !valor);
+         const exactValue = !!(valor && !valorMin && !valorMax);
 
-      const where: Prisma.TransacaoWhereInput = {
-         data: {
-            gte: startDate,
-            lte: endDate,
-         },
-         usuarioId,
-         categoriaId,
-         tipo,
-         ...(hasRangeValues ? {
-            valor: {
-               gte: valorMin,
-               lte: valorMax,
-            },
-         } :
-            {
+         const where: Prisma.TransacaoWhereInput = {
+            usuarioId,
+            categoriaId,
+            tipo,
+            ...(hasRangeValues ? {
                valor: {
-                  equals: valorMin
-               }
-            }),
-         deleted_at: null,
-      };
-
-      const [totalItems, items] = await this.transacoesRepository.$transaction(async (tx) => {
-         return Promise.all([
-            this.transacoesRepository.count({ where }, tx),
-            this.transacoesRepository.list(
-               {
-                  where,
-                  orderBy: {
-                     [orderBy]: ordination,
-                  },
-                  skip: (page - 1) * quantity,
-                  take: quantity,
-                  include: {
-                     categoria: true,
-                  },
+                  gte: valorMin,
+                  lte: valorMax,
                },
-               tx
-            ),
-         ]);
-      });
+            } : {}),
+            ...(aboveSuchValue ? {
+               valor: {
+                  gte: valorMin,
+               },
+            } : {}),
+            ...(belowSuchValue ? {
+               valor: {
+                  lte: valorMax,
+               },
+            } : {}),
+            ...(exactValue ? {
+               valor,
+            } : {}),
+            data: {
+               gte: startDate,
+               lte: endDate,
+            },
+            deleted_at: null,
+         };
 
-      const pages = Math.ceil(totalItems / quantity);
+         const orderBy: Prisma.TransacaoOrderByWithRelationInput = {
+            [order.orderBy]: order.ordination,
+         };
 
-      return {
-         items,
-         totalItems,
-         pages,
-      };
+         const skip = (pagination.page - 1) * pagination.quantity;
+         const take = pagination.quantity;
+
+         const items = await this.transacoesRepository.list(
+            {
+               where,
+               orderBy,
+               skip,
+               take,
+               select: {
+                  id: true,
+                  data: true,
+                  valor: true,
+                  tipo: true,
+                  usuarioId: true,
+                  descricao: true,
+                  deleted_at: true,
+                  categoria: {
+                     select: {
+                        id: true,
+                        nome: true,
+                     }
+                  }
+               }
+            },
+            tx
+         );
+
+         const totalItems = await this.transacoesRepository.count({ where }, tx);
+
+         const pages = Math.ceil(totalItems / pagination.quantity);
+
+         return {
+            pages,
+            items,
+            totalItems,
+         };
+      })
    }
 }
