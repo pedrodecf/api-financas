@@ -2,7 +2,6 @@ import { TipoTransacao, Transacao, Usuario } from "@prisma/client";
 import { CategoriasRepository } from "../../repositories/categorias/categorias-repository";
 import { TransacoesRepository } from "../../repositories/transacoes/transacoes-repository";
 import { UsuarioRepository } from "../../repositories/usuarios/usuario-repository";
-import { RecursoNaoEncontradoError } from "../../errors/recurso-nao-encontrado.error";
 import { NaoAutorizadoError } from "../../errors/nao-autorizado.error";
 import { validateTransacao } from "../../utils/validate-transaction";
 import { validateUser } from "../../utils/validate-user";

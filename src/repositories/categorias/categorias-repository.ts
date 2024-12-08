@@ -1,6 +1,10 @@
 import { Categoria, Prisma } from "@prisma/client"
 
 export interface CategoriasRepository {
+   $transaction<T>(
+      fn: (tx: Prisma.TransactionClient) => Promise<T>
+   ): Promise<T>
+
    create(
       data: Prisma.CategoriaUncheckedCreateInput, tx?: Prisma.TransactionClient
    ): Promise<Categoria>

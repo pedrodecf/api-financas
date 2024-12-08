@@ -3,6 +3,12 @@ import { CategoriasRepository } from "./categorias-repository";
 import { prisma } from "../../lib/prisma";
 
 export class CategoriasHttpRepository implements CategoriasRepository {
+   async $transaction<T>(
+      fn: (tx: Prisma.TransactionClient) => Promise<T>
+   ): Promise<T> {
+      return prisma.$transaction(fn);
+   }
+   
    async create(
       data: Prisma.CategoriaUncheckedCreateInput,
       tx?: Prisma.TransactionClient
@@ -79,7 +85,8 @@ export class CategoriasHttpRepository implements CategoriasRepository {
       const prismaInstance = tx || prisma
       return prismaInstance.categoria.update({
          where: {
-            id
+            id,
+            deleted_at: null
          },
          data
       })

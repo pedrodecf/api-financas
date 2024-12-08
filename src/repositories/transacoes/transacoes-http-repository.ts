@@ -94,4 +94,19 @@ export class TransacoesHttpRepository implements TransacoesRepository {
          data
       });
    }
+
+   async findByCategoriaId(
+      categoriaId: number,
+      usuarioId: string,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao[]> {
+      const prismaClient = tx || prisma;
+      return prismaClient.transacao.findMany({
+         where: {
+            categoriaId,
+            usuarioId,
+            deleted_at: null
+         }
+      });
+   }
 }

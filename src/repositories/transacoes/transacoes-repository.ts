@@ -47,4 +47,10 @@ export interface TransacoesRepository {
       data: Prisma.TransacaoUncheckedUpdateInput,
       tx?: Prisma.TransactionClient
    ): Promise<Transacao>;
+
+   findByCategoriaId(
+      categoriaId: number,
+      usuarioId: string,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao[]>;
 }
