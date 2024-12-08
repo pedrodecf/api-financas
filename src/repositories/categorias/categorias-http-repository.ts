@@ -32,7 +32,13 @@ export class CategoriasHttpRepository implements CategoriasRepository {
 
    async findById(id: number, usuarioId: string, tx?: Prisma.TransactionClient): Promise<Categoria | null> {
       const prismaInstance = tx || prisma
-      return prismaInstance.categoria.findUnique({ where: { id, usuarioId } })
+      return prismaInstance.categoria.findUnique({
+         where: {
+            id,
+            usuarioId,
+            deleted_at: null
+         }
+      })
    }
 
    async delete(id: number): Promise<Categoria> {

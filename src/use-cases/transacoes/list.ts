@@ -47,6 +47,7 @@ export class ListUseCase {
             periodoAte,
          });
 
+         const hasRangeDates = !!(periodoDe && periodoAte);
          const hasRangeValues = !!(valorMin && valorMax && !valor);
          const aboveSuchValue = !!(valorMin && !valorMax && !valor);
          const belowSuchValue = !!(valorMax && !valorMin && !valor);
@@ -75,10 +76,12 @@ export class ListUseCase {
             ...(exactValue ? {
                valor,
             } : {}),
-            data: {
-               gte: startDate,
-               lte: endDate,
-            },
+            ...(hasRangeDates ? {
+               data: {
+                  gte: startDate,
+                  lte: endDate,
+               },
+            } : {}),
             deleted_at: null,
          };
 

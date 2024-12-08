@@ -25,12 +25,20 @@ export class TransacoesHttpRepository implements TransacoesRepository {
 
    async findById(id: number, tx?: Prisma.TransactionClient): Promise<Transacao | null> {
       const prismaInstance = tx || prisma
-      return prismaInstance.transacao.findUnique({ where: { id } })
+      return prismaInstance.transacao.findUnique({
+         where: {
+            id,
+            deleted_at: null
+         }
+      })
    }
 
    async delete(id: number): Promise<Transacao> {
       const transacao = prisma.transacao.update({
-         where: { id },
+         where: {
+            id,
+            deleted_at: null
+         },
          data: { deleted_at: new Date() }
       })
       return transacao
@@ -66,7 +74,10 @@ export class TransacoesHttpRepository implements TransacoesRepository {
    ): Promise<Transacao> {
       const prismaClient = tx || prisma;
       return prismaClient.transacao.update({
-         where: { id },
+         where: {
+            id,
+            deleted_at: null
+         },
          data
       });
    }
