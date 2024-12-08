@@ -3,6 +3,7 @@ import { TransacoesRepository } from "../../repositories/transacoes/transacoes-r
 import { UsuarioRepository } from "../../repositories/usuarios/usuario-repository";
 import { RecursoNaoEncontradoError } from "../../errors/recurso-nao-encontrado.error";
 import { updateBalance } from "../../utils/update-balance";
+import { InternalServerError } from "../../errors/internal-server-erro";
 
 interface DeleteUseCaseRequest {
    id: number;
@@ -24,28 +25,25 @@ export class DeleteUseCase {
       usuarioId
    }: DeleteUseCaseRequest): Promise<DeleteUseCaseResponse> {
       return this.transacoesRepository.$transaction(async (tx) => {
-         const usuario = await this.usuariosRepository.findById(usuarioId);
 
-         if (!usuario) {
-            throw new RecursoNaoEncontradoError('Usuário não encontrado')
-         }
+         const usuario = await this.usuariosRepository.findById(usuarioId, tx);
+         if (!usuario) throw new RecursoNaoEncontradoError('Usuário não encontrado')
 
-         const transacaoToBeDeleted = await this.transacoesRepository.findById(id);
+         const transacaoToBeDeleted = await this.transacoesRepository.findById(id, tx);
+         if (!transacaoToBeDeleted) throw new RecursoNaoEncontradoError('Transação não encontrada');
 
-         if (!transacaoToBeDeleted) {
-            throw new RecursoNaoEncontradoError('Transação não encontrada');
-         }
-
-         if (transacaoToBeDeleted.usuarioId !== usuarioId) {
-            throw new RecursoNaoEncontradoError('Transação não encontrada');
-         }
-
+         if (transacaoToBeDeleted.usuarioId !== usuarioId) throw new RecursoNaoEncontradoError('Transação não encontrada');
          const tipoTransacao = transacaoToBeDeleted.tipo === 'Entrada' ? 'Saida' : 'Entrada'
-         const transacao = await this.transacoesRepository.delete(id);
+
+         const transacao = await this.transacoesRepository.delete(id, tx);
+         if (!transacao) throw new InternalServerError('Erro ao deletar transação');
 
          await updateBalance({
             usuario,
-            balanceData: { tipo: tipoTransacao, valor: transacao.valor },
+            balanceData: {
+               tipo: tipoTransacao,
+               valor: transacao.valor
+            },
             tx,
             usuariosRepository: this.usuariosRepository
          })

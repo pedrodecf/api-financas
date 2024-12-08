@@ -3,27 +3,37 @@ import { TransacoesRepository } from "./transacoes-repository";
 import { prisma } from "../../lib/prisma";
 
 export class TransacoesHttpRepository implements TransacoesRepository {
-   async $transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+   async $transaction<T>(
+      fn: (tx: Prisma.TransactionClient) => Promise<T>
+   ): Promise<T> {
       return prisma.$transaction(fn);
    }
 
-   async create(data: Prisma.TransacaoUncheckedCreateInput, tx?: Prisma.TransactionClient): Promise<Transacao> {
+   async create(
+      data: Prisma.TransacaoUncheckedCreateInput,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao> {
       const prismaInstance = tx || prisma
       return prismaInstance.transacao.create({ data })
    }
 
-   async findByUsuarioId(usuarioId: string): Promise<Transacao[]> {
-      const transacoes = await prisma.transacao.findMany({
+   async findByUsuarioId(
+      usuarioId: string,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao[]> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.transacao.findMany({
          where: {
             usuarioId,
             deleted_at: null
          }
       })
-
-      return transacoes
    }
 
-   async findById(id: number, tx?: Prisma.TransactionClient): Promise<Transacao | null> {
+   async findById(
+      id: number,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao | null> {
       const prismaInstance = tx || prisma
       return prismaInstance.transacao.findUnique({
          where: {
@@ -33,15 +43,18 @@ export class TransacoesHttpRepository implements TransacoesRepository {
       })
    }
 
-   async delete(id: number): Promise<Transacao> {
-      const transacao = prisma.transacao.update({
+   async delete(
+      id: number,
+      tx?: Prisma.TransactionClient
+   ): Promise<Transacao> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.transacao.update({
          where: {
             id,
             deleted_at: null
          },
          data: { deleted_at: new Date() }
       })
-      return transacao
    }
 
    async list(

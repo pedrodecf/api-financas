@@ -3,34 +3,49 @@ import { CategoriasRepository } from "./categorias-repository";
 import { prisma } from "../../lib/prisma";
 
 export class CategoriasHttpRepository implements CategoriasRepository {
-   async create(data: Prisma.CategoriaUncheckedCreateInput): Promise<Categoria> {
-      const categoria = await prisma.categoria.create({ data })
-      return categoria
+   async create(
+      data: Prisma.CategoriaUncheckedCreateInput,
+      tx?: Prisma.TransactionClient
+   ): Promise<Categoria> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.categoria.create({
+         data
+      })
    }
 
-   async findByUsuarioId(usuarioId: string): Promise<Categoria[]> {
-      const categorias = prisma.categoria.findMany({
+   async findByUsuarioId(
+      usuarioId: string,
+      tx?: Prisma.TransactionClient
+   ): Promise<Categoria[]> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.categoria.findMany({
          where: {
             usuarioId,
             deleted_at: null
          }
       })
-
-      return categorias
    }
 
-   async findByName(nome: string, usuarioId: string): Promise<Categoria | null> {
-      const categoria = prisma.categoria.findFirst({
+   async findByName(
+      nome: string,
+      usuarioId: string,
+      tx?: Prisma.TransactionClient
+   ): Promise<Categoria | null> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.categoria.findFirst({
          where: {
             nome,
             usuarioId,
             deleted_at: null
          }
       })
-      return categoria
    }
 
-   async findById(id: number, usuarioId: string, tx?: Prisma.TransactionClient): Promise<Categoria | null> {
+   async findById(
+      id: number,
+      usuarioId: string,
+      tx?: Prisma.TransactionClient
+   ): Promise<Categoria | null> {
       const prismaInstance = tx || prisma
       return prismaInstance.categoria.findUnique({
          where: {
@@ -41,20 +56,33 @@ export class CategoriasHttpRepository implements CategoriasRepository {
       })
    }
 
-   async delete(id: number): Promise<Categoria> {
-      const categoria = prisma.categoria.update({
-         where: { id },
-         data: { deleted_at: new Date() }
+   async delete(
+      id: number,
+      tx?: Prisma.TransactionClient
+   ): Promise<Categoria> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.categoria.update({
+         where: {
+            id
+         },
+         data: {
+            deleted_at: new Date()
+         }
       })
-      return categoria
    }
 
-   async update(id: number, data: Prisma.CategoriaUncheckedUpdateInput): Promise<Categoria> {
-      const categoria = prisma.categoria.update({
-         where: { id },
+   async update(
+      id: number,
+      data: Prisma.CategoriaUncheckedUpdateInput,
+      tx?: Prisma.TransactionClient
+   ): Promise<Categoria> {
+      const prismaInstance = tx || prisma
+      return prismaInstance.categoria.update({
+         where: {
+            id
+         },
          data
       })
-      return categoria
    }
 
 }
