@@ -92,4 +92,26 @@ export class CategoriasHttpRepository implements CategoriasRepository {
       })
    }
 
+   async list(
+      params: {
+         where?: Prisma.CategoriaWhereInput;
+         orderBy?: Prisma.CategoriaOrderByWithRelationInput;
+         skip?: number;
+         take?: number;
+         include?: Prisma.CategoriaInclude;
+         select?: Prisma.CategoriaSelect;
+      },
+      tx?: Prisma.TransactionClient
+   ): Promise<Categoria[]> {
+      const prismaClient = tx || prisma;
+      return prismaClient.categoria.findMany(params);
+   }
+
+   async count(
+      params: { where?: Prisma.CategoriaWhereInput },
+      tx?: Prisma.TransactionClient
+   ): Promise<number> {
+      const prismaClient = tx || prisma;
+      return prismaClient.categoria.count(params);
+   }
 }
