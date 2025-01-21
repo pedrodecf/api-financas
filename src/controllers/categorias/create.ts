@@ -7,16 +7,18 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
    const createBodySchema = z.object({
       nome: z.string(),
       avatar: z.string().optional(),
+      hex: z.string().optional(),
    })
 
    try {
-      const { nome, avatar } = createBodySchema.parse(request.body)
+      const { nome, avatar, hex } = createBodySchema.parse(request.body)
 
       const categoriasRepository = new CategoriasHttpRepository()
       const createUseCase = new CreateUseCase(categoriasRepository)
 
       const { categoria } = await createUseCase.execute({
          nome,
+         hex,
          avatar,
          usuarioId: request.user.sub
       })

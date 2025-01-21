@@ -14,6 +14,7 @@ type Pagination = {
 type Filters = {
    nome?: string;
    usuarioId: string;
+   search?: string;
 }
 
 interface ListUseCaseRequest {

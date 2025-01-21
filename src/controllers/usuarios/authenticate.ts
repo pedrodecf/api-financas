@@ -22,11 +22,12 @@ export async function authenticate(
 
       const token = await reply.jwtSign({
          sub: usuario.id,
+         expiresIn: '7d'
       })
 
       const refreshToken = await reply.jwtSign({
          sub: usuario.id,
-         expiresIn: '7d'
+         expiresIn: '30d'
       })
 
       return reply

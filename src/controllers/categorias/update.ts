@@ -8,6 +8,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
    const updateBodySchema = z.object({
       nome: z.string(),
       avatar: z.string().optional(),
+      hex: z.string().optional(),
    });
 
    const updateParamsSchema = z.object({
@@ -15,7 +16,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
    });
 
    try {
-      const { nome, avatar } = updateBodySchema.parse(request.body);
+      const { nome, avatar, hex } = updateBodySchema.parse(request.body);
       const { id } = updateParamsSchema.parse(request.params);
 
       const usuariosRepository = new UsuarioHttpRepository()
@@ -30,6 +31,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
          id,
          nome,
          avatar,
+         hex,
          usuarioId: request.user.sub,
       });
 

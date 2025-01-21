@@ -14,31 +14,34 @@ datasource db {
 }
 
 model Usuario {
-  id         String      @id @default(uuid())
-  nome       String
-  email      String      @unique
-  senha      String
-  balanco    Float       @default(0.0)
-  transacoes Transacao[]
-  categorias Categoria[]
-  created_at DateTime    @default(now())
-  updated_at DateTime    @updatedAt
-  deleted_at DateTime?
+  id                   String      @id @default(uuid())
+  nome                 String
+  email                String      @unique
+  senha                String
+  balanco              Float       @default(0.0)
+  gastosPorcetagemMeta Int         @default(50)
+  transacoes           Transacao[]
+  categorias           Categoria[]
+  created_at           DateTime    @default(now())
+  updated_at           DateTime    @updatedAt
+  deleted_at           DateTime?
 
   @@map("usuarios")
 }
 
 model Transacao {
-  id          Int           @id @default(autoincrement())
-  valor       Float
-  tipo        TipoTransacao
-  descricao   String?
-  categoria   Categoria     @relation(fields: [categoriaId], references: [id])
-  categoriaId Int
-  data        DateTime      @default(now())
-  usuario     Usuario       @relation(fields: [usuarioId], references: [id])
-  usuarioId   String
-  deleted_at  DateTime?
+  id            Int           @id @default(autoincrement())
+  valor         Float
+  tipo          TipoTransacao
+  custoFixo     Boolean?      @default(false)
+  cartaoCredito Boolean?      @default(false)
+  descricao     String?
+  categoria     Categoria     @relation(fields: [categoriaId], references: [id])
+  categoriaId   Int
+  data          DateTime      @default(now())
+  usuario       Usuario       @relation(fields: [usuarioId], references: [id])
+  usuarioId     String
+  deleted_at    DateTime?
 
   @@map("transacoes")
 }
@@ -48,6 +51,7 @@ model Categoria {
   nome       String
   avatar     String?
   transacoes Transacao[]
+  hex        String?     @default("#6359E9")
   usuario    Usuario     @relation(fields: [usuarioId], references: [id])
   usuarioId  String
   deleted_at DateTime?

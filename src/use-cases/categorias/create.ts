@@ -5,6 +5,7 @@ import { ConteudoExistenteError } from "../../errors/conteudo-existente.error";
 interface CreateUseCaseRequest {
    nome: string
    avatar?: string
+   hex?: string
    usuarioId: string
 }
 
@@ -18,6 +19,7 @@ export class CreateUseCase {
    async execute({
       nome,
       avatar,
+      hex,
       usuarioId
    }: CreateUseCaseRequest): Promise<CreateUseCaseResponse> {
       const categoriaWithSameName = await this.categoriasRepository.findByName(nome, usuarioId)
@@ -29,6 +31,7 @@ export class CreateUseCase {
       const categoria = await this.categoriasRepository.create({
          nome,
          avatar,
+         hex,
          usuarioId
       })
 
