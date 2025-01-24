@@ -31,11 +31,19 @@ export async function authenticate(
       })
 
       return reply
+         .setCookie('token-finity', token, {
+            path: '/',
+            secure: true,
+            sameSite: 'strict',
+            httpOnly: true,
+            maxAge: 60 * 60 * 24 * 7,
+         })
          .setCookie('refreshToken', refreshToken, {
             path: '/',
             secure: true,
-            sameSite: true,
+            sameSite: 'strict',
             httpOnly: true,
+            maxAge: 60 * 60 * 24 * 30, 
          })
          .code(200)
          .send({ token })

@@ -13,10 +13,9 @@ export async function list(request: FastifyRequest, reply: FastifyReply) {
     categoriaId: z.coerce.number().optional(),
     periodoDe: z.string().optional(),
     periodoAte: z.string().optional(),
-    page: z.coerce.number().positive(),
-    quantity: z.coerce.number().positive(),
     orderBy: z.enum(["id", "data", "valor"]),
     ordination: z.enum(["asc", "desc"]),
+    name: z.string().optional(),
   });
   try {
     const {
@@ -27,18 +26,18 @@ export async function list(request: FastifyRequest, reply: FastifyReply) {
       categoriaId,
       periodoDe,
       periodoAte,
-      page,
-      quantity,
       orderBy,
       ordination,
+      name,
     } = listQuerySchema.parse(request.query);
 
     const transacoesRepository = new TransacoesHttpRepository();
     const listUseCase = new ListUseCase(transacoesRepository);
 
-    const { items, pages, totalItems, balance } = await listUseCase.execute({
+    const { items, balance } = await listUseCase.execute({
       filters: {
         ...filterObjects({
+          name,
           tipo,
           valor,
           valorMin,
@@ -52,14 +51,10 @@ export async function list(request: FastifyRequest, reply: FastifyReply) {
       order: {
         orderBy,
         ordination,
-      },
-      pagination: {
-        page,
-        quantity,
-      },
+      }
     });
 
-    reply.status(200).send({ items, pages, totalItems, balance });
+    reply.status(200).send({ items, balance });
   } catch (err) {
     throw err;
   }
