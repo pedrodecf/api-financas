@@ -34,14 +34,14 @@ export async function authenticate(
          .setCookie('token-finity', token, {
             path: '/',
             secure: true,
-            sameSite: 'strict',
+            sameSite: 'none',
             httpOnly: true,
             maxAge: 60 * 60 * 24 * 7,
          })
          .setCookie('refreshToken', refreshToken, {
             path: '/',
             secure: true,
-            sameSite: 'strict',
+            sameSite: 'none',
             httpOnly: true,
             maxAge: 60 * 60 * 24 * 30, 
          })
