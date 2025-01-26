@@ -11,7 +11,7 @@ import { usuariosRoutes } from "./routes/usuarios.routes";
 export const app = fastify();
 
 app.register(fastifyCors, {
-  origin: [env.FRONT_URL],
+  origin: env.FRONT_URL.split(','),
   credentials: true,
 });
 
