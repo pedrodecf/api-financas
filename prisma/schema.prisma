@@ -35,6 +35,7 @@ model Transacao {
   tipo          TipoTransacao
   custoFixo     Boolean?      @default(false)
   cartaoCredito Boolean?      @default(false)
+  parcelas      Json?
   descricao     String?
   categoria     Categoria     @relation(fields: [categoriaId], references: [id])
   categoriaId   Int

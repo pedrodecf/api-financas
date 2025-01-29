@@ -17,6 +17,10 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     ),
     custoFixo: z.boolean().optional().nullable(),
     cartaoCredito: z.boolean().optional().nullable(),
+    parcelas: z.object({
+      total: z.number().nullable(),
+      atual: z.number().nullable(),
+    }).optional().nullable(),
   });
 
   try {
@@ -28,6 +32,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       data,
       cartaoCredito,
       custoFixo,
+      parcelas,
     } = createBodySchema.parse(request.body);
 
     const transacoesRepository = new TransacoesHttpRepository();
@@ -49,6 +54,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       usuarioId: request.user.sub,
       cartaoCredito,
       custoFixo,
+      parcelas,
     });
 
     reply.status(201).send({ transacao, balanco: usuario.balanco });

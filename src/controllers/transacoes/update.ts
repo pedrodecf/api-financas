@@ -17,6 +17,12 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     ),
     custoFixo: z.boolean().optional().nullable(),
     cartaoCredito: z.boolean().optional().nullable(),
+    parcelas: z
+      .object({
+        total: z.number().nullable(),
+        atual: z.number().nullable(),
+      })
+      .optional().nullable(),
   });
 
   const updateParamsSchema = z.object({
@@ -32,6 +38,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       data,
       cartaoCredito,
       custoFixo,
+      parcelas,
     } = updateBodySchema.parse(request.body);
     const { id } = updateParamsSchema.parse(request.params);
 
@@ -55,6 +62,7 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       custoFixo,
       data: data,
       usuarioId: request.user.sub,
+      parcelas,
     });
 
     reply.status(201).send({ transacao, balanco: usuario.balanco });

@@ -18,6 +18,10 @@ interface UpdateUseCaseRequest {
   usuarioId: string;
   custoFixo?: boolean | null;
   cartaoCredito?: boolean | null;
+  parcelas?: {
+    total: number;
+    atual: number;
+  };
 }
 
 interface UpdateUseCaseResponse {
@@ -42,6 +46,7 @@ export class UpdateUseCase {
     usuarioId,
     custoFixo,
     cartaoCredito,
+    parcelas,
   }: UpdateUseCaseRequest): Promise<UpdateUseCaseResponse> {
     return this.transacoesRepository.$transaction(async (tx) => {
       const transacao = await validateTransacao({
@@ -79,6 +84,8 @@ export class UpdateUseCase {
           tipo,
           cartaoCredito,
           custoFixo,
+          parcelas:
+            parcelas?.atual === 0 || parcelas?.total === 0 ? undefined : parcelas,
         },
         tx
       );

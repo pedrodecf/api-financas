@@ -129,6 +129,7 @@ export class ListUseCase {
             cartaoCredito: true,
             categoriaId: true,
             custoFixo: true,
+            parcelas: true,
             categoria: {
               select: {
                 id: true,

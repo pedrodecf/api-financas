@@ -16,6 +16,10 @@ interface CreateUseCaseRequest {
   usuarioId: string;
   custoFixo?: boolean | null;
   cartaoCredito?: boolean | null;
+  parcelas?: {
+    total: number | null;
+    atual: number | null;
+  } | null;
 }
 
 interface CreateUseCaseResponse {
@@ -39,6 +43,7 @@ export class CreateUseCase {
     usuarioId,
     cartaoCredito,
     custoFixo,
+    parcelas,
   }: CreateUseCaseRequest): Promise<CreateUseCaseResponse> {
     return this.transacoesRepository.$transaction(async (tx) => {
       const usuario = await validateUser({
@@ -64,6 +69,7 @@ export class CreateUseCase {
           usuarioId,
           cartaoCredito,
           custoFixo,
+          parcelas,
         },
         tx,
         transacoesRepository: this.transacoesRepository,
